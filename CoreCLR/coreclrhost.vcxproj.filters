@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\git\dotnet\EzDotnet\CoreCLR\dotnetcore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{C1E4B117-B2F4-3BF1-8FE3-AAE115F36D03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
