@@ -287,15 +287,8 @@
     <ClCompile Include="E:\git\dotnet\EzDotnet\samples\cli\ezdotnet.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="E:\git\dotnet\EzDotnet\ZERO_CHECK.vcxproj">
-      <Project>{9090BC8D-40E6-3E88-8D1E-5296C8B1EA00}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="E:\git\dotnet\EzDotnet\common\common.vcxproj">
-      <Project>{E648B906-AEE8-30A5-A8AA-76AA3172EFD7}</Project>
-      <Name>common</Name>
+    <ProjectReference Include="..\..\common\common.vcxproj">
+      <Project>{e648b906-aee8-30a5-a8aa-76aa3172efd7}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

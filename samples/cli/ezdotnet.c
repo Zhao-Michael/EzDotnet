@@ -19,6 +19,7 @@
 #endif
 
 typedef ASMHANDLE(APICALL* clrInitFunc)(const char* asmPath, const char* asmDir, int enableDebug);
+typedef int (APICALL* clrDeInit)(ASMHANDLE handle);
 typedef int (APICALL* runMethodFunc)(ASMHANDLE handle, const char* typeName, const char* methodName, int argc, char* argv[]);
 
 #if defined(WIN32) || defined(__CYGWIN__)
@@ -29,14 +30,8 @@ typedef int (APICALL* runMethodFunc)(ASMHANDLE handle, const char* typeName, con
 #define GET_PWD(buf, size) getcwd(buf, size)
 #endif
 
-int dotnet_run(
-	const char* loaderPath,
-	const char* asmPath,
-	const char* targetClassName, const char* targetMethodName,
-	int argc, char* argv[],
-	runMethodFunc* p_runMethod,
-	ASMHANDLE* p_ASMHANDLE
-) {
+
+EXPORT int initdotnet(const char* loaderPath, const char* asmPath, ASMHANDLE* p_ASMHANDLE, runMethodFunc* p_runMethod) {
 	char* finalLoaderPath = NULL;
 
 #ifdef __CYGWIN__
@@ -76,15 +71,25 @@ int dotnet_run(
 	printf("calling clrInit, pwd: %s, asm: %s\n", buf, asmPath);
 	ASMHANDLE handle = clrInit(asmPath, buf, DEBUG_MODE);
 
-	printf("calling runMethod, handle: %zu\n", handle);
-	runMethod(handle, targetClassName, targetMethodName, argc, argv);
-
 	*p_runMethod = runMethod;
 	*p_ASMHANDLE = handle;
 	return 0;
 }
 
-EXPORT int main(int argc, char* argv[]) {
+
+EXPORT int rundotnet(
+	runMethodFunc p_runMethod,
+	ASMHANDLE p_ASMHANDLE,
+	const char* targetClassName,
+	const char* targetMethodName,
+	int argc,
+	const char* argv[]
+) {
+	printf("calling runMethod, handle: %zu\n", p_ASMHANDLE);
+	return p_runMethod(p_ASMHANDLE, targetClassName, targetMethodName, argc, argv);
+}
+
+int main(int argc, char* argv[]) {
 	if (argc < 5) {
 		fprintf(stderr, "Usage: %s [loaderPath] [asmPath] [className] [methodName]\n", argv[0]);
 		return 1;
@@ -96,8 +101,9 @@ EXPORT int main(int argc, char* argv[]) {
 	int mod_argc = argc - 5;
 	char** mod_argv = (char**)&argv[5];
 
-	runMethodFunc p_runMethod = 0;
 	ASMHANDLE p_ASMHANDLE = 0;
-	int res = dotnet_run(loaderPath, asmPath, className, methodName, mod_argc, mod_argv, &p_runMethod, &p_ASMHANDLE);
+	runMethodFunc p_runMethod = 0;
+	int res = initdotnet(loaderPath, asmPath, &p_ASMHANDLE, &p_runMethod);
+	rundotnet(p_runMethod, p_ASMHANDLE, className, methodName, mod_argc, mod_argv);
 	return res;
 }
