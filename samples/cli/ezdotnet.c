@@ -31,7 +31,7 @@ typedef int (APICALL* runMethodFunc)(ASMHANDLE handle, const char* typeName, con
 #endif
 
 
-EXPORT int initdotnet(const char* loaderPath, const char* asmPath, ASMHANDLE* p_ASMHANDLE, runMethodFunc* p_runMethod) {
+EXPORT int initdotnet(const char* loaderPath, const char* asmPath, ASMHANDLE* p_ASMHANDLE, runMethodFunc* p_runMethod, clrDeInit* p_clrDeInit) {
 	char* finalLoaderPath = NULL;
 
 #ifdef __CYGWIN__
@@ -65,6 +65,12 @@ EXPORT int initdotnet(const char* loaderPath, const char* asmPath, ASMHANDLE* p_
 		return -1;
 	}
 
+	clrDeInit clrDeInit = (runMethodFunc)LIB_GETSYM(hmod, "clrDeInit");
+	if (runMethod == NULL) {
+		fputs("clrDeInit not found", stderr);
+		return -1;
+	}
+
 	char buf[255];
 	GET_PWD(buf, sizeof(buf));
 
@@ -73,6 +79,7 @@ EXPORT int initdotnet(const char* loaderPath, const char* asmPath, ASMHANDLE* p_
 
 	*p_runMethod = runMethod;
 	*p_ASMHANDLE = handle;
+	*p_clrDeInit = clrDeInit;
 	return 0;
 }
 
@@ -103,7 +110,9 @@ int main(int argc, char* argv[]) {
 
 	ASMHANDLE p_ASMHANDLE = 0;
 	runMethodFunc p_runMethod = 0;
-	int res = initdotnet(loaderPath, asmPath, &p_ASMHANDLE, &p_runMethod);
+	clrDeInit p_clrDeInit = 0;
+	int res = initdotnet(loaderPath, asmPath, &p_ASMHANDLE, &p_runMethod, &p_clrDeInit);
 	rundotnet(p_runMethod, p_ASMHANDLE, className, methodName, mod_argc, mod_argv);
+	p_clrDeInit(p_ASMHANDLE);
 	return res;
 }

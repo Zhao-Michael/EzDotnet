@@ -262,6 +262,9 @@ extern "C" {
 		if (::pfnClose == nullptr || ::runtimeHandle == nullptr) {
 			return false;
 		}
+
+		gPlugins.clear();
+
 		::pfnClose(::runtimeHandle);
 		return true;
 	}
